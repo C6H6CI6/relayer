@@ -26,7 +26,7 @@ class Action {
 
   async charge (tx, index) {
 
-    console.log(`process charge tx:\n${JSON.stringify(tx,null,2)}`);
+    console.log(`process charge tx:\n${tx.hash}`);
 
     //info muta
     let proof = await get_tx_out_proof(tx.hash);
@@ -54,7 +54,7 @@ class Action {
 
   async withdraw (tx) {
 
-    console.log(`process withdraw tx:\n${JSON.stringify(tx,null,2)}`);
+    console.log(`process charge tx:\n${tx.hash}`);
 
 
     let proof = await get_tx_out_proof(tx.hash);
