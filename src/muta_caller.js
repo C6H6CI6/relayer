@@ -22,6 +22,15 @@ class MutaCaller {
     console.log(`MutaCaller test ${height}`);
   }
 
+  async get_proof(txhash){
+    return {
+      "lemmas": [],
+      "indices": [
+        "0x0000000000000000"
+      ]
+    }
+  }
+
   async get_lasted_ckb_header_height () {
     const servicePayload = {
       caller: this.account.address,
@@ -97,12 +106,15 @@ class MutaCaller {
     }
 
     console.log(`deposit output: ${JSON.stringify(receipt.response,null,2)}`)
+
+
   }
 
   async refund (tx, merkle_path) {
 
   }
 
+  //返回proof的hex string
   async create_asset (ckb_tx, indices, lemmas) {
     let payload = {
       ckb_tx:ckb_tx,
@@ -110,9 +122,10 @@ class MutaCaller {
       lemmas: lemmas
     };
 
-    for(let i = 0; i < payload.ckb_tx.cellDeps.length; i++){
-      if(payload.ckb_tx.cellDeps[i].depType === 'depGroup'){
-        payload.ckb_tx.cellDeps[i].depType='dep_group';
+    payload = snakeCaseKeys(payload);
+    for(let i = 0; i < payload.ckb_tx.cell_deps.length; i++){
+      if(payload.ckb_tx.cell_deps[i].dep_type === 'depGroup'){
+        payload.ckb_tx.cell_deps[i].dep_type='dep_group';
       }
     }
     delete payload.ckb_tx.hash;
@@ -137,28 +150,51 @@ class MutaCaller {
       console.log('create_asset error \n' + JSON.stringify(receipt, null, 2));
     }
 
-    return receipt.response.ret;
+    let r = receipt.response.ret;
+    r  = r.substring(1,r.length-1);
+    r = r.substring(24); //多了24个字符长度的bls address
+    return r
   }
 
-  async burn_asset (tx, indices, lemmas) {
+  async burn_asset (ckb_tx, indices, lemmas) {
     let payload = {
-      ckb_tx: tx,
+      ckb_tx:ckb_tx,
       indices: indices,
       lemmas: lemmas
     };
 
-    const servicePayload = {
-      caller: this.account.address,
-      method: 'burn_asset',
-      payload: JSON.stringify(snakeCaseKeys(payload), null, 2),
-      serviceName: 'mulimuli',
-    };
-
-    const res = await this.client.queryServiceDyn(servicePayload);
-
-    if (res.isError === true) {
-      console.log(`burn_asset error: ${JSON.stringify(res)}`);
+    payload = snakeCaseKeys(payload);
+    for(let i = 0; i < payload.ckb_tx.cell_deps.length; i++){
+      if(payload.ckb_tx.cell_deps[i].dep_type === 'depGroup'){
+        payload.ckb_tx.cell_deps[i].dep_type='dep_group';
+      }
     }
+    delete payload.ckb_tx.hash;
+    payload = snakeCaseKeys(payload);
+
+
+
+    payload = JSON.stringify(snakeCaseKeys(payload), null, 2);
+    const tx = await this.client.composeTransaction({
+      method: 'burn_asset',
+      payload,
+      serviceName: 'mulimuli',
+    });
+
+    let signedTx = this.account.signTransaction(tx);
+
+    const txHash = await this.client.sendTransaction(signedTx);
+
+    const receipt = await this.client.getReceipt(this.toHex(txHash));
+
+    if (receipt.response.isError) {
+      console.log('burn_asset error \n' + JSON.stringify(receipt, null, 2));
+    }
+
+    let r = receipt.response.ret;
+   // r  = r.substring(1,r.length-1);
+   // r = r.substring(24); //多了24个字符长度的bls address
+    return r
   }
 
   toHex (x) {

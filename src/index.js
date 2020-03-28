@@ -6,9 +6,10 @@ const Dao = require('./dao');
 
 const job_scan_block = require('./job_scan_block');
 const job_sync_block_to_muta = require('./job_sync_block_to_muta');
+const job_relay = require('./job_relay');
 let mongoUri = 'mongodb://localhost:27017';
 
-const nodeUrl = 'http://localhost:8114';
+const ckbUrl = 'http://localhost:8114';
 
 //const nodeUrl = 'http://47.56.237.128:4114'
 
@@ -22,7 +23,7 @@ async function main () {
 
   const dao = new Dao(mongoClient);
   await dao.start();
-  const ckb = new CKB(nodeUrl);
+  const ckb = new CKB(ckbUrl);
 
   const mutaClient = new MutaCaller();
 
@@ -32,20 +33,40 @@ async function main () {
     mutaClient: mutaClient
   };
 
-  job_scan_block.apply(context);
+  //job_scan_block.apply(context);
 
-  job_sync_block_to_muta.apply(context);
+  //job_sync_block_to_muta.apply(context);
 
-  /*let job = new CronJob(
+  //job_relay.apply(context);
+  let job = new CronJob(
     '0/5 * * * * *',
-    block_header_job,
+    job_scan_block,
     null,
     null,
     null,
     context
   );
-  job.start();*/
+  job.start();
 
+  job = new CronJob(
+    '0/5 * * * * *',
+    job_sync_block_to_muta,
+    null,
+    null,
+    null,
+    context
+  );
+  job.start();
+
+  job = new CronJob(
+    '0/5 * * * * *',
+    job_relay,
+    null,
+    null,
+    null,
+    context
+  );
+  job.start();
 }
 
 main();
