@@ -73,65 +73,71 @@ class MutaCaller {
     }
   }
 
-  async deposit (tx, merkle_path) {
+  async deposit (ckb_tx, indices,lemmas) {
     let payload = {
-      tx: tx,
-      merkle_path: merkle_path
+      ckb_tx:ckb_tx,
+      indices: indices,
+      lemmas: lemmas
     };
-
-    const servicePayload = {
-      caller: this.account.address,
-      method: 'deposit_ckb',
-      payload: JSON.stringify(snakeCaseKeys(payload), null, 2),
+    payload = JSON.stringify(snakeCaseKeys(payload), null, 2);
+    const tx = await this.client.composeTransaction({
+      method: 'deposit',
+      payload,
       serviceName: 'mulimuli',
-    };
+    });
 
-    const res = await this.client.queryServiceDyn(servicePayload);
+    let signedTx = this.account.signTransaction(tx);
 
-    if (res.isError === true) {
-      console.log(`deposit error: ${JSON.stringify(res)}`);
+    const txHash = await this.client.sendTransaction(signedTx);
+
+    const receipt = await this.client.getReceipt(this.toHex(txHash));
+
+    if (receipt.response.isError) {
+      console.log('deposit error \n' + JSON.stringify(receipt, null, 2));
     }
+
+    console.log(`deposit output: ${JSON.stringify(receipt.response,null,2)}`)
   }
 
   async refund (tx, merkle_path) {
-    let payload = {
-      tx: tx,
-      merkle_path: merkle_path
-    };
 
-    const servicePayload = {
-      caller: this.account.address,
-      method: 'refund_ckb',
-      payload: JSON.stringify(snakeCaseKeys(payload), null, 2),
-      serviceName: 'mulimuli',
-    };
-
-    const res = await this.client.queryServiceDyn(servicePayload);
-
-    if (res.isError === true) {
-      console.log(`refund error: ${JSON.stringify(res)}`);
-    }
   }
 
-  async create_asset (tx, indices, lemmas) {
+  async create_asset (ckb_tx, indices, lemmas) {
     let payload = {
-      ckb_tx: tx,
+      ckb_tx:ckb_tx,
       indices: indices,
       lemmas: lemmas
     };
 
-    const servicePayload = {
-      caller: this.account.address,
-      method: 'create_asset',
-      payload: JSON.stringify(snakeCaseKeys(payload), null, 2),
-      serviceName: 'mulimuli',
-    };
-
-    const res = await this.client.queryServiceDyn(servicePayload);
-
-    if (res.isError === true) {
-      console.log(`create_asset error: ${JSON.stringify(res)}`);
+    for(let i = 0; i < payload.ckb_tx.cellDeps.length; i++){
+      if(payload.ckb_tx.cellDeps[i].depType === 'depGroup'){
+        payload.ckb_tx.cellDeps[i].depType='dep_group';
+      }
     }
+    delete payload.ckb_tx.hash;
+    payload = snakeCaseKeys(payload);
+
+
+
+    payload = JSON.stringify(snakeCaseKeys(payload), null, 2);
+    const tx = await this.client.composeTransaction({
+      method: 'create_asset',
+      payload,
+      serviceName: 'mulimuli',
+    });
+
+    let signedTx = this.account.signTransaction(tx);
+
+    const txHash = await this.client.sendTransaction(signedTx);
+
+    const receipt = await this.client.getReceipt(this.toHex(txHash));
+
+    if (receipt.response.isError) {
+      console.log('create_asset error \n' + JSON.stringify(receipt, null, 2));
+    }
+
+    return receipt.response.ret;
   }
 
   async burn_asset (tx, indices, lemmas) {

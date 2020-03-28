@@ -14,6 +14,8 @@ class Dao {
 
   async start () {
     await this.block_header_collection.ensureIndex({'height': 1}, {unique: true});
+    await this.last_sync_collection.ensureIndex({'class': 1}, {unique: true});
+    await this.relay_collection.ensureIndex({'class': 1}, {unique: true});
 
     let record = await this.last_sync_collection.findOne({'class': 'last_sync'});
 
