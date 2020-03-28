@@ -76,7 +76,7 @@ class MutaCaller {
 
           const receipt = await this.client.getReceipt(this.toHex(txHash));
 
-          //console.log(`committed ${headers[i].number} to Muta`);
+          console.log(`committed ${outgoing.length} to Muta, starts from ${outgoing[0].number}`);
 
           if (receipt.response.isError) {
             //console.log('update_ckb error \n' + JSON.stringify(receipt, null, 2));
