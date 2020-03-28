@@ -18,7 +18,7 @@ async function job_relay () {
 
     let last_relay_height = await dao.get_last_relay_scan();
 
-    console.log(`job_relay ${last_relay_height} -->  ${last_sync_ckb_height}`);
+    //console.log(`job_relay ${last_relay_height} -->  ${last_sync_ckb_height}`);
 
     for (let i = last_relay_height + 1; i <= last_sync_ckb_height; i++) {
       let block = (await dao.get_ckb_blocks(i, i))[0];
@@ -33,7 +33,7 @@ async function job_relay () {
             && output.type.code_hash === '0x28e83a1277d48add8e72fadaa9248559e1b632bab2bd60b27955ebc4c03800a5'
             && output.type.args === '0x6666666666666666666666666666666666666666') {
 
-            console.log(`find type code_hash in tx ${tx.hash}`);
+            console.log(`job_relay, find type code_hash in tx ${tx.hash}`);
 
             await action.judge(tx,k);
 

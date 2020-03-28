@@ -19,6 +19,9 @@ class Action {
     ) {
       await this.withdraw(tx);
     }
+    else{
+      console.log(`unknown tx`)
+    }
   }
 
   async charge (tx, index) {

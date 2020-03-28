@@ -57,7 +57,7 @@ class MutaCaller {
 
       if(outgoing.length >= 100 || i === headers.length-1){
         //force commit
-        console.log(`prepare flush ${outgoing.length} headers to Muta`);
+        //console.log(`prepare flush ${outgoing.length} headers to Muta`);
         try {
           //let payload = {headers: [headers[i]]};
           let payload = {headers: outgoing};

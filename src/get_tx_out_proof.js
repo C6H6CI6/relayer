@@ -2,15 +2,15 @@ const axios = require('axios');
 
 async function get_tx_out_proof (tx0xHexString) {
   console.log('get_tx_out_proof fake data!!');
-  
+
   let body = {
     id: 2,
     jsonrpc: '2.0',
     method: 'get_tx_out_proof',
     params: [
       [
-        '0x4abc7eccea8e3b86610aad709ed0aa757d954bd02575b7b1edb085f2d8b39cf0'
-        // tx0xHexString
+        //'0x4abc7eccea8e3b86610aad709ed0aa757d954bd02575b7b1edb085f2d8b39cf0'
+        tx0xHexString
       ]
     ]
   };

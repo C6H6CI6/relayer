@@ -13,7 +13,7 @@ async function job_scan_block () {
 
     let current_block_number = BigInt(await ckb.rpc.getTipBlockNumber());
 
-    console.log(`job_scan_block ${last_sync_ckb_height} -->  ${current_block_number}`);
+    //console.log(`job_scan_block ${last_sync_ckb_height} -->  ${current_block_number}`);
 
 
     for (let i = last_sync_ckb_height + BigInt(1); i <= current_block_number; i++) {

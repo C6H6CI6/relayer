@@ -101,7 +101,7 @@ class Dao {
     );
 
     if (originalOne === null) {
-      console.log('release_ckb_scan error');
+      //console.log('release_ckb_scan error');
     }
   }
 
@@ -183,7 +183,7 @@ class Dao {
     );
 
     if (originalOne === null) {
-      console.log('release_relay_scan error');
+      //console.log('release_relay_scan error');
     }
   }
 
