@@ -11,10 +11,11 @@ async function job_sync_block_to_muta () {
     console.log(`job_sync_block_to_muta starts`);
 
     let last_committed = await mutaCaller.get_lasted_ckb_header_height();
-    console.log(`last_committed ${last_committed}`);
 
     let last_synced = await dao.get_last_ckb_scan();
-    console.log(`last_synced ${last_synced}`);
+
+    console.log(`job_sync_block_to_muta ${last_committed} --> ${last_synced}`);
+
     let headers = null;
 
     if (last_committed >= last_synced) {

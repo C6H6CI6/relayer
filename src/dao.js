@@ -15,6 +15,7 @@ class Dao {
     await this.block_header_collection.drop();
     await this.last_sync_collection.drop();
     await this.relay_collection.drop();
+    console.log(`collection dropped`);
 
   }
   async start () {

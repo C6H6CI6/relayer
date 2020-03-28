@@ -22,6 +22,8 @@ async function job_relay () {
 
     let last_relay_height = await dao.get_last_relay_scan();
 
+    console.log(`job_relay ${last_relay_height} -->  ${last_sync_ckb_height}`);
+
     for (let i = last_relay_height + 1; i <= last_sync_ckb_height; i++) {
       let block = (await dao.get_ckb_blocks(i, i))[0];
       for (let j = 0; j < block.transactions.length; j++) {
