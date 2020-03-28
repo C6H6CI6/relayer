@@ -8,7 +8,6 @@ async function job_sync_block_to_muta () {
     } else {
       return;
     }
-    console.log(`job_sync_block_to_muta starts`);
 
     let last_committed = await mutaCaller.get_lasted_ckb_header_height();
 
@@ -20,6 +19,7 @@ async function job_sync_block_to_muta () {
 
     if (last_committed >= last_synced) {
       console.log(`job_sync_block_to_muta, last_committed ${last_committed}, ${last_synced}, nothing to do`);
+      this.sync_block_to_muta_lock = false;
       return;
     }
 
@@ -28,6 +28,7 @@ async function job_sync_block_to_muta () {
     console.log(`job_sync_block_to_muta, commit [${last_committed + 1},${last_synced}] to Muta`);
     mutaCaller.commit_ckb_header(headers);
   }catch (e) {
+    this.sync_block_to_muta_lock = false;
   }
 
   this.sync_block_to_muta_lock = false;

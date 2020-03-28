@@ -8,15 +8,11 @@ async function job_relay () {
   const mutaCaller = this.mutaClient;
   const action = new Action(ckb,mutaCaller);
 
-  console.log('relay job starts');
-
   try {
 
     if (!await dao.lock_relay_scan()) {
       return;
     }
-
-    console.log(`job_relay starts`);
 
     let last_sync_ckb_height = await dao.get_last_ckb_scan();
 
@@ -52,6 +48,7 @@ async function job_relay () {
     //===================
 
   } catch (e) {
+
     console.log(e);
   }
   await dao.release_relay_scan();

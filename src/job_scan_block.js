@@ -2,16 +2,12 @@ async function job_scan_block () {
 
   const ckb = this.ckb;
   const dao = this.dao;
-  console.log('block_header job starts');
 
   try {
 
     if (!await dao.lock_ckb_scan()) {
       return;
     }
-
-    console.log(`job_scan_block starts`);
-
 
     let last_sync_ckb_height = BigInt(await dao.get_last_ckb_scan());
 
