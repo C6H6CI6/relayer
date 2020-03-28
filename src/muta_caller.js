@@ -22,13 +22,13 @@ class MutaCaller {
     console.log(`MutaCaller test ${height}`);
   }
 
-  async get_proof(txhash){
+  async get_proof (txhash) {
     return {
-      "lemmas": [],
-      "indices": [
-        "0x0000000000000000"
+      'lemmas': [],
+      'indices': [
+        '0x0000000000000000'
       ]
-    }
+    };
   }
 
   async get_lasted_ckb_header_height () {
@@ -49,42 +49,55 @@ class MutaCaller {
   }
 
   async commit_ckb_header (headers) {
-
+    let outgoing = [];
     for (let i = 0; i < headers.length; i++) {
       delete headers[i].hash;
 
-      try {
-        let payload = {headers: [headers[i]]};
-        payload = JSON.stringify(snakeCaseKeys(payload), null, 2);
-        //console.log(payload)
+      outgoing.push(headers[i]);
 
-        const tx = await this.client.composeTransaction({
-          method: 'update_ckb',
-          payload,
-          serviceName: 'mulimuli',
-        });
+      if(outgoing.length >= 25 || i === headers.length-1){
+        //force commit
+        console.log(`prepare flush ${outgoing.length} headers to Muta`);
+        try {
+          //let payload = {headers: [headers[i]]};
+          let payload = {headers: outgoing};
+          payload = JSON.stringify(snakeCaseKeys(payload), null, 2);
+          //console.log(payload)
 
-        let signedTx = this.account.signTransaction(tx);
+          const tx = await this.client.composeTransaction({
+            method: 'update_ckb',
+            payload,
+            serviceName: 'mulimuli',
+          });
 
-        const txHash = await this.client.sendTransaction(signedTx);
+          let signedTx = this.account.signTransaction(tx);
 
-        const receipt = await this.client.getReceipt(this.toHex(txHash));
+          const txHash = await this.client.sendTransaction(signedTx);
 
-        console.log(`committed ${headers[i].number} to Muta`);
+          const receipt = await this.client.getReceipt(this.toHex(txHash));
 
-        if (receipt.response.isError) {
-          console.log('update_ckb error \n' + JSON.stringify(receipt, null, 2));
+          //console.log(`committed ${headers[i].number} to Muta`);
+
+          if (receipt.response.isError) {
+            //console.log('update_ckb error \n' + JSON.stringify(receipt, null, 2));
+
+            return;
+          }
+
+        } catch (e) {
+          // console.log('commit_ckb_header error !!! \n' + JSON.stringify(e, null, 2));
         }
 
-      } catch (e) {
-        console.log('error !!! \n' + JSON.stringify(e, null, 2));
+        outgoing = [];
+      }else{
+        continue;
       }
     }
   }
 
-  async deposit (ckb_tx, indices,lemmas) {
+  async deposit (ckb_tx, indices, lemmas) {
     let payload = {
-      ckb_tx:ckb_tx,
+      ckb_tx: ckb_tx,
       indices: indices,
       lemmas: lemmas
     };
@@ -97,17 +110,20 @@ class MutaCaller {
 
     let signedTx = this.account.signTransaction(tx);
 
-    const txHash = await this.client.sendTransaction(signedTx);
+    try {
+      const txHash = await this.client.sendTransaction(signedTx);
 
-    const receipt = await this.client.getReceipt(this.toHex(txHash));
+      const receipt = await this.client.getReceipt(this.toHex(txHash));
 
-    if (receipt.response.isError) {
-      console.log('deposit error \n' + JSON.stringify(receipt, null, 2));
+      if (receipt.response.isError) {
+        console.log('deposit error \n' + JSON.stringify(receipt, null, 2));
+      }
+
+      console.log(`deposit output: ${JSON.stringify(receipt.response, null, 2)}`);
+
+    } catch (e) {
+      console.log('deposit error !!! \n' + JSON.stringify(e, null, 2));
     }
-
-    console.log(`deposit output: ${JSON.stringify(receipt.response,null,2)}`)
-
-
   }
 
   async refund (tx, merkle_path) {
@@ -116,85 +132,90 @@ class MutaCaller {
 
   //返回proof的hex string
   async create_asset (ckb_tx, indices, lemmas) {
-    let payload = {
-      ckb_tx:ckb_tx,
-      indices: indices,
-      lemmas: lemmas
-    };
+    try {
+      let payload = {
+        ckb_tx: ckb_tx,
+        indices: indices,
+        lemmas: lemmas
+      };
 
-    payload = snakeCaseKeys(payload);
-    for(let i = 0; i < payload.ckb_tx.cell_deps.length; i++){
-      if(payload.ckb_tx.cell_deps[i].dep_type === 'depGroup'){
-        payload.ckb_tx.cell_deps[i].dep_type='dep_group';
+      payload = snakeCaseKeys(payload);
+      for (let i = 0; i < payload.ckb_tx.cell_deps.length; i++) {
+        if (payload.ckb_tx.cell_deps[i].dep_type === 'depGroup') {
+          payload.ckb_tx.cell_deps[i].dep_type = 'dep_group';
+        }
       }
+      delete payload.ckb_tx.hash;
+      payload = snakeCaseKeys(payload);
+
+      payload = JSON.stringify(snakeCaseKeys(payload), null, 2);
+      const tx = await this.client.composeTransaction({
+        method: 'create_asset',
+        payload,
+        serviceName: 'mulimuli',
+      });
+
+      let signedTx = this.account.signTransaction(tx);
+
+      const txHash = await this.client.sendTransaction(signedTx);
+
+      const receipt = await this.client.getReceipt(this.toHex(txHash));
+
+      if (receipt.response.isError) {
+        console.log('create_asset error \n' + JSON.stringify(receipt, null, 2));
+      }
+
+      let r = receipt.response.ret;
+      r = r.substring(1, r.length - 1);
+      r = r.substring(24); //多了24个字符长度的bls address
+      return r;
+    } catch (e) {
+      console.log('create_asset error !!! \n' + JSON.stringify(e, null, 2));
     }
-    delete payload.ckb_tx.hash;
-    payload = snakeCaseKeys(payload);
-
-
-
-    payload = JSON.stringify(snakeCaseKeys(payload), null, 2);
-    const tx = await this.client.composeTransaction({
-      method: 'create_asset',
-      payload,
-      serviceName: 'mulimuli',
-    });
-
-    let signedTx = this.account.signTransaction(tx);
-
-    const txHash = await this.client.sendTransaction(signedTx);
-
-    const receipt = await this.client.getReceipt(this.toHex(txHash));
-
-    if (receipt.response.isError) {
-      console.log('create_asset error \n' + JSON.stringify(receipt, null, 2));
-    }
-
-    let r = receipt.response.ret;
-    r  = r.substring(1,r.length-1);
-    r = r.substring(24); //多了24个字符长度的bls address
-    return r
   }
 
   async burn_asset (ckb_tx, indices, lemmas) {
-    let payload = {
-      ckb_tx:ckb_tx,
-      indices: indices,
-      lemmas: lemmas
-    };
+    try {
+      let payload = {
+        ckb_tx: ckb_tx,
+        indices: indices,
+        lemmas: lemmas
+      };
 
-    payload = snakeCaseKeys(payload);
-    for(let i = 0; i < payload.ckb_tx.cell_deps.length; i++){
-      if(payload.ckb_tx.cell_deps[i].dep_type === 'depGroup'){
-        payload.ckb_tx.cell_deps[i].dep_type='dep_group';
+      payload = snakeCaseKeys(payload);
+      for (let i = 0; i < payload.ckb_tx.cell_deps.length; i++) {
+        if (payload.ckb_tx.cell_deps[i].dep_type === 'depGroup') {
+          payload.ckb_tx.cell_deps[i].dep_type = 'dep_group';
+        }
       }
+      delete payload.ckb_tx.hash;
+      payload = snakeCaseKeys(payload);
+
+      payload = JSON.stringify(snakeCaseKeys(payload), null, 2);
+      const tx = await this.client.composeTransaction({
+        method: 'burn_asset',
+        payload,
+        serviceName: 'mulimuli',
+      });
+
+      let signedTx = this.account.signTransaction(tx);
+
+      const txHash = await this.client.sendTransaction(signedTx);
+
+      const receipt = await this.client.getReceipt(this.toHex(txHash));
+
+      if (receipt.response.isError) {
+        console.log('burn_asset error \n' + JSON.stringify(receipt, null, 2));
+      }
+
+      let r = receipt.response.ret;
+      // r  = r.substring(1,r.length-1);
+      // r = r.substring(24); //多了24个字符长度的bls address
+      return r;
+
+    } catch (e) {
+      console.log('burn_asset error !!! \n' + JSON.stringify(e, null, 2));
     }
-    delete payload.ckb_tx.hash;
-    payload = snakeCaseKeys(payload);
-
-
-
-    payload = JSON.stringify(snakeCaseKeys(payload), null, 2);
-    const tx = await this.client.composeTransaction({
-      method: 'burn_asset',
-      payload,
-      serviceName: 'mulimuli',
-    });
-
-    let signedTx = this.account.signTransaction(tx);
-
-    const txHash = await this.client.sendTransaction(signedTx);
-
-    const receipt = await this.client.getReceipt(this.toHex(txHash));
-
-    if (receipt.response.isError) {
-      console.log('burn_asset error \n' + JSON.stringify(receipt, null, 2));
-    }
-
-    let r = receipt.response.ret;
-   // r  = r.substring(1,r.length-1);
-   // r = r.substring(24); //多了24个字符长度的bls address
-    return r
   }
 
   toHex (x) {

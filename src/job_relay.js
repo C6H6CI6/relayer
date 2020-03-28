@@ -16,6 +16,8 @@ async function job_relay () {
       return;
     }
 
+    console.log(`job_relay starts`);
+
     let last_sync_ckb_height = await dao.get_last_ckb_scan();
 
     let last_relay_height = await dao.get_last_relay_scan();

@@ -30,7 +30,8 @@ async function main () {
   let context = {
     ckb: ckb,
     dao: dao,
-    mutaClient: mutaClient
+    mutaClient: mutaClient,
+    sync_block_to_muta_lock : false,
   };
 
   //job_scan_block.apply(context);

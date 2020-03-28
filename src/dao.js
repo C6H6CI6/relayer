@@ -11,7 +11,12 @@ class Dao {
     this.relay_collection = db.collection('relay');
 
   }
+  async drop(){
+    await this.block_header_collection.drop();
+    await this.last_sync_collection.drop();
+    await this.relay_collection.drop();
 
+  }
   async start () {
     await this.block_header_collection.ensureIndex({'height': 1}, {unique: true});
     await this.last_sync_collection.ensureIndex({'class': 1}, {unique: true});
@@ -63,7 +68,7 @@ class Dao {
   async lock_ckb_scan () {
     let record = await this.last_sync_collection.findOne({'class': 'last_sync'});
     if (record.running === true) {
-      console.log('block_header job is still running, exit');
+      //console.log('block_header job is still running, exit');
       return false;
     }
 
@@ -145,7 +150,7 @@ class Dao {
   async lock_relay_scan () {
     let record = await this.relay_collection.findOne({'class': 'relay'});
     if (record.running === true) {
-      console.log('relay job is still running, exit');
+      //console.log('relay job is still running, exit');
       return false;
     }
 
