@@ -68,21 +68,21 @@ class MutaCaller {
         }
 
       } catch (e) {
-        console.log('error !!! \n' + JSON.stringify(e,null,2));
+        console.log('error !!! \n' + JSON.stringify(e, null, 2));
       }
     }
   }
 
-  async deposit(tx,merkle_path){
+  async deposit (tx, merkle_path) {
     let payload = {
       tx: tx,
-      merkle_path : merkle_path
+      merkle_path: merkle_path
     };
 
     const servicePayload = {
       caller: this.account.address,
       method: 'deposit_ckb',
-      payload: JSON.stringify(snakeCaseKeys(payload),null,2),
+      payload: JSON.stringify(snakeCaseKeys(payload), null, 2),
       serviceName: 'mulimuli',
     };
 
@@ -93,16 +93,16 @@ class MutaCaller {
     }
   }
 
-  async refund(tx,merkle_path){
+  async refund (tx, merkle_path) {
     let payload = {
       tx: tx,
-      merkle_path : merkle_path
+      merkle_path: merkle_path
     };
 
     const servicePayload = {
       caller: this.account.address,
       method: 'refund_ckb',
-      payload: JSON.stringify(snakeCaseKeys(payload),null,2),
+      payload: JSON.stringify(snakeCaseKeys(payload), null, 2),
       serviceName: 'mulimuli',
     };
 
@@ -113,16 +113,17 @@ class MutaCaller {
     }
   }
 
-  async create_asset(tx,indices,lemmas){
+  async create_asset (tx, indices, lemmas) {
     let payload = {
+      ckb_tx: tx,
       indices: indices,
-      lemmas : lemmas
+      lemmas: lemmas
     };
 
     const servicePayload = {
       caller: this.account.address,
       method: 'create_asset',
-      payload: JSON.stringify(snakeCaseKeys(payload),null,2),
+      payload: JSON.stringify(snakeCaseKeys(payload), null, 2),
       serviceName: 'mulimuli',
     };
 
@@ -133,16 +134,17 @@ class MutaCaller {
     }
   }
 
-  async burn_asset(tx,indices,lemmas){
+  async burn_asset (tx, indices, lemmas) {
     let payload = {
+      ckb_tx: tx,
       indices: indices,
-      lemmas : lemmas
+      lemmas: lemmas
     };
 
     const servicePayload = {
       caller: this.account.address,
       method: 'burn_asset',
-      payload: JSON.stringify(snakeCaseKeys(payload),null,2),
+      payload: JSON.stringify(snakeCaseKeys(payload), null, 2),
       serviceName: 'mulimuli',
     };
 

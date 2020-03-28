@@ -4,13 +4,13 @@ async function job_scan_block () {
   const dao = this.dao;
   console.log('block_header job starts');
 
-  if(! await dao.lock_ckb_scan()){
+  if (!await dao.lock_ckb_scan()) {
     return;
   }
 
   try {
 
-    let last_sync_ckb_height = BigInt( await dao.get_last_ckb_scan());
+    let last_sync_ckb_height = BigInt(await dao.get_last_ckb_scan());
 
     let current_block_number = BigInt(await ckb.rpc.getTipBlockNumber());
 
@@ -26,7 +26,6 @@ async function job_scan_block () {
     }
 
     //===================
-
 
   } catch (e) {
     console.log(e);

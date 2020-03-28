@@ -26,7 +26,6 @@ async function main () {
 
   const mutaClient = new MutaCaller();
 
-
   let context = {
     ckb: ckb,
     dao: dao,
@@ -48,6 +47,5 @@ async function main () {
   job.start();*/
 
 }
-
 
 main();
