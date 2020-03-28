@@ -13,7 +13,7 @@ async function job_sync_block_to_muta () {
 
     let last_synced = await dao.get_last_ckb_scan();
 
-    //console.log(`job_sync_block_to_muta ${last_committed} --> ${last_synced}`);
+    console.log(`job_sync_block_to_muta ${last_committed} --> ${last_synced}`);
 
     let headers = null;
 
