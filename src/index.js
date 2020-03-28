@@ -9,9 +9,9 @@ const job_sync_block_to_muta = require('./job_sync_block_to_muta');
 const job_relay = require('./job_relay');
 let mongoUri = 'mongodb://localhost:27017';
 
-const ckbUrl = 'http://localhost:8114';
+//const ckbUrl = 'http://localhost:8114';
 
-//const nodeUrl = 'http://47.56.237.128:4114'
+const ckbUrl = 'http://47.56.237.128:4114'
 
 async function main () {
   let mongoClient = await MongoClient.connect(mongoUri,
