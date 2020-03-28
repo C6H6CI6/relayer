@@ -16,8 +16,8 @@ const fs=require('fs');
   let composer = new Composer();
   const action = new Action(ckb,mutaClient);
 
-  //let tx =JSON.parse(fs.readFileSync('./mock-charge.json'));
-  let tx =JSON.parse(fs.readFileSync('./mock-withdraw.json'));
+  let tx =JSON.parse(fs.readFileSync('./mock-charge.json'));
+  //let tx =JSON.parse(fs.readFileSync('./mock-withdraw.json'));
 
   for (let k = 0; k < tx.outputs.length; k++) {
 

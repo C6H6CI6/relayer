@@ -30,7 +30,7 @@ class Action {
 
     //info muta
     let proof = await get_tx_out_proof(tx.hash);
-    //let proof_hex = await this.mutaClient.create_asset(tx, proof.indices, proof.lemmas);
+    let proof_hex = await this.mutaClient.create_asset(tx, proof.indices, proof.lemmas);
     //compose ctx_tx
 
     let outputdata = '0x04' + tx.outputs_data[0].substring(4);
