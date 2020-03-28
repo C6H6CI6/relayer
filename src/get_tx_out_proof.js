@@ -1,8 +1,10 @@
 const axios = require('axios');
 
 async function get_tx_out_proof (tx0xHexString) {
-  console.log('get_tx_out_proof fake data!!');
-
+  //console.log('get_tx_out_proof fake data!!');
+  if(!tx0xHexString.startsWith('0x')){
+    console.log(`get_tx_out_proof error: tx0xHexString : ${tx0xHexString}`);
+  }
   let body = {
     id: 2,
     jsonrpc: '2.0',
@@ -39,7 +41,7 @@ async function get_tx_out_proof (tx0xHexString) {
 
 module.exports=get_tx_out_proof;
 
-get_tx_out_proof();
+//get_tx_out_proof();
 
 /*
 
