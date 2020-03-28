@@ -22,6 +22,9 @@ class Action {
   }
 
   async charge (tx, index) {
+
+    console.log(`process charge tx:\n${JSON.stringify(tx,null,2)}`);
+
     //info muta
     let proof = await get_tx_out_proof(tx.hash);
     //let proof_hex = await this.mutaClient.create_asset(tx, proof.indices, proof.lemmas);
@@ -47,6 +50,10 @@ class Action {
   }
 
   async withdraw (tx) {
+
+    console.log(`process withdraw tx:\n${JSON.stringify(tx,null,2)}`);
+
+
     let proof = await get_tx_out_proof(tx.hash);
     let proof_hex = await this.mutaClient.burn_asset(tx, proof.indices, proof.lemmas);
 
@@ -77,6 +84,10 @@ class Action {
     // ckb_tx.hash=hash;
     let res = await this.ckb.rpc.sendTransaction(ckb_tx);
     //console.log(`withdraw res : \n${JSON.stringify(res, null, 2)}`);
+  }
+
+  async deposit(tx){
+
   }
 }
 
