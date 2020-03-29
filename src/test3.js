@@ -16,7 +16,7 @@ const fs = require('fs');
   let composer = new Composer();
   const action = new Action(ckb, mutaClient);
 
-  let block = await ckb.rpc.getBlock('0x65a43af2aea451f6cae553802561293b8feb47ac1950eb519baab273fcadd0af');
+  let block = await ckb.rpc.getBlock('0x0ae2a5910f449ac602ed77336477851dfcf4be40ba6dd18a18f240d6a37014bb');
   block = snakeCaseKeys(block);
 
   for (let j = 0; j < block.transactions.length; j++) {

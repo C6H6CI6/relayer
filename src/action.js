@@ -48,7 +48,12 @@ class Action {
 
     let hash = this.ckb.utils.rawTransactionToHash(ckb_tx);
     // ckb_tx.hash=hash;
-    let res = await this.ckb.rpc.sendTransaction(ckb_tx);
+    try{
+      let res = await this.ckb.rpc.sendTransaction(ckb_tx);
+    }catch (e) {
+      console.log(e);
+      console.log(`charge skip send ckb tx back, ${tx.hash}`)
+    }
     //console.log(`charge res : \n${JSON.stringify(res, null, 2)}`);
   }
 
@@ -85,8 +90,13 @@ class Action {
 
     let hash = this.ckb.utils.rawTransactionToHash(ckb_tx);
     // ckb_tx.hash=hash;
-    let res = await this.ckb.rpc.sendTransaction(ckb_tx);
-    //console.log(`withdraw res : \n${JSON.stringify(res, null, 2)}`);
+    try{
+      let res = await this.ckb.rpc.sendTransaction(ckb_tx);
+      //console.log(`withdraw res : \n${JSON.stringify(res, null, 2)}`);
+    }catch (e) {
+      console.log(e);
+      console.log(`withdraw skip send ckb tx back, ${tx.hash}`)
+    }
   }
 
   async deposit(tx){
