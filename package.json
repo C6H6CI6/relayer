@@ -14,7 +14,7 @@
   "license": "ISC",
   "dependencies": {
     "@nervosnetwork/ckb-sdk-core": "^0.30.0",
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "camelcase-keys": "^6.2.1",
     "cron": "^1.8.2",
     "mongodb": "^3.5.5",
